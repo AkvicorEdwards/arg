@@ -13,93 +13,174 @@ import "github.com/AkvicorEdwards/arg"
 To install docopt in your $GOPATH:
 
 ```shell script
-go get github.com/AkvicorEdwards/arg"
+go get "github.com/AkvicorEdwards/arg"
 ```
 
 # Usage
 
+## Template Code
+
 ```go
-// Set Root Command
-RootCommand.Name = "Arg"
-RootCommand.Size = -1
-RootCommand.Describe = `Arg is a project for go,
+package main
+
+import (
+	"errors"
+	"fmt"
+	"github.com/AkvicorEdwards/arg"
+)
+
+var Err1 = errors.New("err1")
+var Err2 = errors.New("err2")
+
+func main() {
+	// Set Root Command
+	arg.RootCommand.Name = "Arg"
+	arg.RootCommand.Size = -1
+	arg.RootCommand.Describe = `Arg is a project for go,
 to parse arguments and execute command
 This project is free`
-RootCommand.DescribeBrief = "Arg is a arguments parser"
-RootCommand.Usage = "[arguments...]"
-RootCommand.Executor = func(str []string) error {
-	fmt.Println("RootCommand.Executor is run", str)
-	return nil
-}
-RootCommand.ErrorHandler = func(err error) error {
-	fmt.Println("Handle Error:", err)
-	return nil
-}
-
-// Add a Command
-err = AddCommand([]string{"build"}, 2, "build to fi", 
-        "build a file to fi", "", "[ori filename] [target filename]", 
-        func(str []string) error {
-	fmt.Println("build", str[1:])
-	return nil
-}, func(err error) error {
-	fmt.Println("Handled build err:", err)
-	return err
-})
-
-// Add a Option
-err = AddOption([]string{"build", "-type"}, 1, 10, 
-        "This is a type for test", "test type", "", "", 
-        func(str []string) error {
-	fmt.Println("build type", str[1])
-	if str[1] == "err1" {
-		return Err1
-	}
-	if str[1] == "err2" {
-		return Err2
-	}
-	return nil
-}, func(err error) error {
-	fmt.Println("Handle build.type err", err)
-	if err == Err1 {
+	arg.RootCommand.DescribeBrief = "Arg is a arguments parser"
+	arg.RootCommand.Usage = "[arguments...]"
+	arg.RootCommand.Executor = func(str []string) error {
+		fmt.Println("RootCommand.Executor is run", str)
 		return nil
 	}
-	if err == Err2 {
-		return err
+	arg.RootCommand.ErrorHandler = func(err error) error {
+		fmt.Println("RootCommand.Handler Error:", err)
+		return nil
 	}
-	return nil
-})
-if err != nil {
-	fmt.Println("1:", err)
+
+	// Add a Command
+	vBuildType := ""
+	vBuildDel := false
+	err := arg.AddCommand([]string{"build"}, 2, "build to fi",
+		"build a file to fi", "", "[ori filename] [target filename]",
+		func(str []string) error {
+			fmt.Println("build", vBuildType, str[1:])
+			if vBuildDel {
+				fmt.Println("build delete file", str[1:])
+			}
+			return nil
+		}, func(err error) error {
+			fmt.Println("Handled build err:", err)
+			return err
+		})
+
+	// Add a Option
+	err = arg.AddOption([]string{"build", "-type"}, 1, 10,
+		"This is a type for test", "test type", "", "[type]",
+		func(str []string) error {
+			fmt.Println("build type", str[1])
+			vBuildType = str[1]
+			if str[1] == "err1" {
+				return Err1
+			}
+			if str[1] == "err2" {
+				return Err2
+			}
+			return nil
+		}, func(err error) error {
+			fmt.Println("Handle build.type err", err)
+			if err == Err1 {
+				return nil
+			}
+			if err == Err2 {
+				return err
+			}
+			return nil
+		})
+	if err != nil {
+		fmt.Println("1:", err)
+	}
+
+	// Add a Option
+	err = arg.AddOption([]string{"build", "-del"}, 0, 10,
+		"delete origin file after build", "del origin file", "User design help", "",
+		func(str []string) error {
+			vBuildDel = true
+			return nil
+		}, nil)
+	if err != nil {
+		fmt.Println("2:", err)
+	}
+
+	arg.RootCommand.GenerateHelp()
+	err = arg.Parse()
+	if err != nil {
+		fmt.Println("Parse Error:", err)
+	}
+	fmt.Println("Finished")
 }
-
-// Generate Help
-RootCommand.GenerateHelp()
-
-// The specified "help" parameters
-AddHelpCommandArg("help")
-
-// Parse
-err = Parse()
 ```
 
-After `RootCommand.GenerateHelp()`
+## Test
+
+```shell script
+go build
+```
+
+### RootCommand
 
 ```
-Arg
+$ ./aflag Akvicor
+RootCommand.Executor is run [./aflag Akvicor]
+Finished
+```
 
-    Arg is a project for go,
-to parse arguments and execute command
-This project is free
+### build
 
-Usage:
-        Arg [arguments...]        Arg <command> [arguments]
+```
+$ ./aflag build            
+Handled build err: wrong number of arg
+Parse Error: wrong number of arg
+Finished
+```
 
-The commands are:
+### build with args
 
-        build build a file to fi
+```
+$ ./aflag build file1 file2               
+build  [file1 file2]
+Finished
+```
 
-Use "Arg help <command>" for more information about a command.
+### build with -type
+
+```
+$ ./aflag build file1 file2 -type tgz     
+build type tgz
+build tgz [file1 file2]
+Finished
+```
+
+### build with -type and -del
+
+```
+$ ./aflag build file1 file2 -type tgz -del
+build type tgz
+build tgz [file1 file2]
+build delete file [file1 file2]
+Finished
+```
+
+### build with err1
+
+```
+$ ./aflag build -type err1 file1 file2
+build type err1
+Handle build.type err err1
+build fixed [file1 file2]
+Finished
+```
+
+### build with err2
+
+```
+$ ./aflag build -type err2 file1 file2
+build type err2
+Handle build.type err err2
+Parse Error: err2
+Finished
 ```
 
 # API
