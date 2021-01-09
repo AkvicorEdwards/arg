@@ -109,9 +109,14 @@ func Parse() (err error) {
 	if err != nil {
 		return err
 	}
+	if command.Executor == nil {
+		return nil
+	}
 	err = command.Executor(commandArgs)
 	if err != nil {
-		err = command.ErrorHandler(err)
+		if command.ErrorHandler != nil {
+			err = command.ErrorHandler(err)
+		}
 	}
 	return err
 }

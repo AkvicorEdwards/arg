@@ -43,9 +43,14 @@ func (q *workQueue) add(priority int, executor FuncExecutor, errExecutor FuncErr
 // Exec All work, Start execution from the first item in the Work Queue
 func (q *workQueue) exec() (err error) {
 	for _, v := range *q {
-		err = v.Executor(v.Args)
-		if err != nil {
-			return v.ErrorHandler(err)
+		if v.Executor != nil {
+			err = v.Executor(v.Args)
+			if err != nil {
+				if v.ErrorHandler != nil {
+					return v.ErrorHandler(err)
+				}
+				return err
+			}
 		}
 	}
 	return nil
