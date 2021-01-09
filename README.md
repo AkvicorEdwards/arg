@@ -4,13 +4,13 @@ A command-line arguments parser
 
 # Installation
 
-Use the alias "arg". To use docopt in your Go code:
+Use the alias "arg". To use Arg in your Go code:
 
 ```go
 import "github.com/AkvicorEdwards/arg"
 ```
 
-To install docopt in your $GOPATH:
+To install Arg in your $GOPATH:
 
 ```shell script
 go get "github.com/AkvicorEdwards/arg"
