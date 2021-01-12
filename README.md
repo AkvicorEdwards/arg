@@ -183,6 +183,29 @@ Parse Error: err2
 Finished
 ```
 
+## OptionCombination
+
+if an arguments is not
+
+- Command
+- Option
+- "Help"
+
+1. Each letter of this parameter will be prefixed and then
+checked whether it is a parameter.
+2. Option.Size must be equal to 0
+3. if all the newly formed parameters are legal, execute them
+
+`EnableOptionCombination()` equal `OptionCombination='-'`
+
+if `OptionCombination = ' '`, set `prefix = ''`
+
+**Example:**
+
+`OptionCombination=' '` `arguments = "abcd"` = `a` `b` `c` `d`
+
+`OptionCombination='-'` `arguments = "-abcd"` = `-a` `-b` `-c` `-d`
+
 # API
 
 ## Package

@@ -83,7 +83,9 @@ var TplHelp = `
 Arg
 	Arg is a arguments parser
 */
-var TplDescribe = "%s\n\n    %s"
+//var TplDescribe = "%s\n\n    %s"
+var TplDescribeUp = "%s"
+var TplDescribeDown = "\n\n    %s"
 
 // TplUsage =====================================================
 /*
@@ -91,6 +93,7 @@ Usage:
 		arg <command> [arguments]
 */
 var TplUsage = `Usage:
+
 %s`
 
 // HTplCommandList ======================================================
@@ -148,7 +151,7 @@ Usage: %s
 		build   build to tgz
 #       name    describeBrief
 */
-var HTplLineCommand = `        %%-%ds %%s
+var HTplLineCommand = `        %%-%ds  %%s
 `
 
 // HTplLineOption ======================================================

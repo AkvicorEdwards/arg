@@ -14,6 +14,8 @@ var HelpCommandArgs = make(map[string]bool)
 // Work Queue
 var queue = make(workQueue, 0)
 
+var OptionCombination int32 = 0
+
 // The Command to be executed
 var command = RootCommand
 
@@ -85,6 +87,10 @@ func Add(isCmd bool, arg []string, size, priority int, describe, describeBrief, 
 		return ErrWrongArgPath
 	}
 	return nil
+}
+
+func EnableOptionCombination() {
+	OptionCombination = '-'
 }
 
 // Parse
@@ -178,6 +184,38 @@ func parse(cmd *Command, args []string) error {
 		}
 		cmd.PrintHelp()
 		return ErrHelp
+	}
+
+	if OptionCombination != 0 {
+		format := ""
+		if OptionCombination == ' ' {
+			format = "%c"
+		} else {
+			format = fmt.Sprintf("%c%%c", OptionCombination)
+		}
+		checked := true
+		for k, v := range args[0] {
+			if k == 0 && v == OptionCombination {
+				continue
+			}
+			o, ok := cmd.Options[fmt.Sprintf(format, v)]
+			if !ok || o.Size != 0 {
+				checked = false
+				break
+			}
+		}
+		if checked {
+			op := ""
+			for k, v := range args[0] {
+				if k == 0 && v == OptionCombination {
+					continue
+				}
+				op = fmt.Sprintf(format, v)
+				o, _ := cmd.Options[op]
+				queue.add(o.Priority, o.Executor, o.ErrorExecutor, []string{op})
+			}
+			return parse(cmd, args[1:])
+		}
 	}
 
 	commandArgs = append(commandArgs, args[0])

@@ -105,7 +105,21 @@ func (c *Command) GenerateHelp() {
 		}
 		return
 	}()
-	describe := fmt.Sprintf(TplDescribe, fullName, c.Describe)
+	describe := func() string {
+		up := fmt.Sprintf(TplDescribeUp, fullName)
+		down := fmt.Sprintf(TplDescribeDown, c.Describe)
+		fg := true
+		for _, v := range down {
+			if v != ' ' && v != '\n' {
+				fg = false
+				break
+			}
+		}
+		if fg {
+			down = ""
+		}
+		return up + down
+	}()
 	cmd := false
 	opt := false
 	usageHead := func() string {
