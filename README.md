@@ -105,6 +105,7 @@ This project is free`
 	}
 
 	arg.RootCommand.GenerateHelp()
+	arg.AddHelpCommandArg("help")
 	err = arg.Parse()
 	if err != nil {
 		fmt.Println("Parse Error:", err)
@@ -183,6 +184,31 @@ Parse Error: err2
 Finished
 ```
 
+### help
+
+```
+$ ./aflag help
+
+Arg
+
+    Arg is a project for go,
+to parse arguments and execute command
+This project is free
+
+Usage:
+        Arg [arguments...]        Arg <command> [arguments]
+
+The commands are:
+
+        build build a file to fi
+
+Use "Arg help <command>" for more information about a command.
+
+Parse Error: help
+Finished
+
+```
+
 ## OptionCombination
 
 if an arguments is not
@@ -229,6 +255,7 @@ Add(isCmd bool, arg []string, size, priority int, describe,
 ```go
 Parse()
 ```
+
 ```go
 AddHelpCommandArg("help")
 ```
