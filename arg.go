@@ -32,9 +32,10 @@ func AddHelpCommandArg(h string) {
 //
 // arg is the path for command, like "go mod download" is []string{"mod", "download"}
 //	size  is the number of arguments
-func AddCommand(arg []string, size int, describe, describeBrief, help, usage string,
+//	order  little first
+func AddCommand(arg []string, order, size int, describe, describeBrief, help, usage string,
 	executor FuncExecutor, errExecutor FuncErrorHandler) error {
-	return Add(true, arg, size, 0, describe, describeBrief, help, usage, executor, errExecutor)
+	return Add(true, arg, order, size, 0, describe, describeBrief, help, usage, executor, errExecutor)
 }
 
 // AddOption
@@ -44,9 +45,10 @@ func AddCommand(arg []string, size int, describe, describeBrief, help, usage str
 //	arg  is the path for option, like "go mod -version" is []string{"mod", "-version"}
 //	size  is the number of arguments
 //	priority  is the execution priority
-func AddOption(arg []string, size, priority int, describe, describeBrief, help, usage string,
+//	order  little first
+func AddOption(arg []string, order, size, priority int, describe, describeBrief, help, usage string,
 	executor FuncExecutor, errExecutor FuncErrorHandler) error {
-	return Add(false, arg, size, priority, describe, describeBrief, help, usage, executor, errExecutor)
+	return Add(false, arg, order, size, priority, describe, describeBrief, help, usage, executor, errExecutor)
 }
 
 // Add
@@ -54,7 +56,7 @@ func AddOption(arg []string, size, priority int, describe, describeBrief, help, 
 // add a Command or Option to RootCommand
 //
 // You can use this function through AddCommand and AddOption
-func Add(isCmd bool, arg []string, size, priority int, describe, describeBrief, help, usage string,
+func Add(isCmd bool, arg []string, order, size, priority int, describe, describeBrief, help, usage string,
 	executor FuncExecutor, errExecutor FuncErrorHandler) error {
 	var args = RootCommand
 	argLength := len(arg) - 1
@@ -66,13 +68,13 @@ func Add(isCmd bool, arg []string, size, priority int, describe, describeBrief, 
 				if args.Commands == nil {
 					args.Commands = NewCommands()
 				}
-				args.Commands[v] = NewCommandFull(v, father, describe, describeBrief, help,
+				args.Commands[v] = NewCommandFull(order, v, father, describe, describeBrief, help,
 					usage, size, executor, errExecutor)
 			} else {
 				if args.Options == nil {
 					args.Options = NewOptions()
 				}
-				args.Options[v] = NewOptionFull(v, father, size, priority, describe, describeBrief,
+				args.Options[v] = NewOptionFull(order, v, father, size, priority, describe, describeBrief,
 					help, usage, executor, errExecutor)
 			}
 			return nil

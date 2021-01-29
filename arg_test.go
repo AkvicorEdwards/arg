@@ -32,7 +32,7 @@ This project is free`
 		return nil
 	}
 
-	err = AddOption([]string{"-type"}, 1, 10, "This is a type for test",
+	err = AddOption([]string{"-type"}, 1, 1, 10, "This is a type for test",
 		"test type", "", "", func(str []string) error {
 			fmt.Println("Enter type", str[1])
 			if str[1] == "err1" {
@@ -96,7 +96,7 @@ This project is free`
 		return nil
 	}
 
-	err = AddCommand([]string{"build"}, 2, "build to fi", "build a file to fi", "",
+	err = AddCommand([]string{"build"}, 1, 2, "build to fi", "build a file to fi", "",
 		"[ori filename] [target filename]", func(str []string) error {
 			fmt.Println("build", str[1:])
 			return nil
@@ -105,7 +105,7 @@ This project is free`
 			return err
 		})
 
-	err = AddOption([]string{"build", "-type"}, 1, 10, "This is a type for test",
+	err = AddOption([]string{"build", "-type"}, 1, 1, 10, "This is a type for test",
 		"test type", "", "", func(str []string) error {
 			fmt.Println("build type", str[1])
 			if str[1] == "err1" {
@@ -145,7 +145,7 @@ This project is free`
 }
 
 func ExampleAddCommand() {
-	err := AddCommand([]string{"version"}, 1, "check version", "check programme version",
+	err := AddCommand([]string{"version"}, 1, 1, "check version", "check programme version",
 		"", "[version]", func(str []string) error {
 			if Version == str[1] {
 				return nil
@@ -161,7 +161,7 @@ func ExampleAddCommand() {
 }
 
 func ExampleAddOption() {
-	err := AddCommand([]string{"-phone"}, -1, "specify phone number",
+	err := AddCommand([]string{"-phone"}, 1, -1, "specify phone number",
 		"specify user phone number", "", "[phone number]", func(str []string) error {
 			for k, v := range str {
 				if len(v) != 11 {
@@ -180,7 +180,7 @@ func ExampleAddOption() {
 
 func ExampleAdd() {
 	// Add command
-	_ = Add(true, []string{"phone"}, -1, 0 /* invalid parameter */, "specify phone number",
+	_ = Add(true, []string{"phone"}, 1, -1, 0 /* invalid parameter */, "specify phone number",
 		"specify user phone number", "", "[phone number]", func(str []string) error {
 			for k, v := range str {
 				if len(v) != 11 {
@@ -193,7 +193,7 @@ func ExampleAdd() {
 			return err
 		})
 	// Add option
-	_ = Add(false, []string{"-phone"}, -1, 100, "specify phone number",
+	_ = Add(false, []string{"-phone"}, 1, -1, 100, "specify phone number",
 		"specify user phone number", "", "[phone number]", func(str []string) error {
 			for k, v := range str {
 				if len(v) != 11 {
@@ -220,22 +220,22 @@ func ExampleEnableOptionCombination() {
 		fmt.Println("Root Command", str)
 		return nil
 	}
-	_ = Add(false, []string{"-p"}, 0, 100, "",
+	_ = Add(false, []string{"-p"}, 1, 0, 100, "",
 	"", "", "", func(str []string) error {
 			fmt.Println("Enter -p:", str[0])
 			return nil
 		}, nil)
-	_ = Add(false, []string{"-d"}, 0, 100, "",
+	_ = Add(false, []string{"-d"}, 2, 0, 100, "",
 	"", "", "", func(str []string) error {
 			fmt.Println("Enter -d:", str[0])
 			return nil
 		}, nil)
-	_ = Add(false, []string{"-w"}, 0, 100, "",
+	_ = Add(false, []string{"-w"}, 3, 0, 100, "",
 	"", "", "", func(str []string) error {
 			fmt.Println("Enter -w:", str[0])
 			return nil
 		}, nil)
-	_ = Add(false, []string{"-a"}, 0, 100, "",
+	_ = Add(false, []string{"-a"}, 4, 0, 100, "",
 	"", "", "", func(str []string) error {
 			fmt.Println("Enter -a:", str[0])
 			return nil
@@ -250,22 +250,22 @@ func ExampleEnableOptionCombination() {
 	queue = make(workQueue, 0)
 	commandArgs = []string{"fi"}
 	os.Args = []string{"fi", "pdwa", "Akvicor"}
-	_ = Add(false, []string{"p"}, 0, 100, "",
+	_ = Add(false, []string{"p"}, 1, 0, 100, "",
 		"", "", "", func(str []string) error {
 			fmt.Println("Enter p:", str[0])
 			return nil
 		}, nil)
-	_ = Add(false, []string{"d"}, 0, 100, "",
+	_ = Add(false, []string{"d"}, 1, 0, 100, "",
 		"", "", "", func(str []string) error {
 			fmt.Println("Enter d:", str[0])
 			return nil
 		}, nil)
-	_ = Add(false, []string{"w"}, 0, 100, "",
+	_ = Add(false, []string{"w"}, 1, 0, 100, "",
 		"", "", "", func(str []string) error {
 			fmt.Println("Enter w:", str[0])
 			return nil
 		}, nil)
-	_ = Add(false, []string{"a"}, 0, 100, "",
+	_ = Add(false, []string{"a"}, 1, 0, 100, "",
 		"", "", "", func(str []string) error {
 			fmt.Println("Enter a:", str[0])
 			return nil
@@ -303,7 +303,7 @@ func ExampleAddHelpCommandArg() {
 		return nil
 	}
 
-	err := AddCommand([]string{"version"}, 1, "check version", "check programme version",
+	err := AddCommand([]string{"version"}, 1, 1, "check version", "check programme version",
 		"", "[version]", func(str []string) error {
 			fmt.Println("version", str)
 			return nil
@@ -311,7 +311,7 @@ func ExampleAddHelpCommandArg() {
 	if err != nil {
 		panic(err)
 	}
-	err = AddOption([]string{"-phone"}, -1, 100, "specify phone number",
+	err = AddOption([]string{"-phone"}, 1, -1, 100, "specify phone number",
 		"specify user phone number", "", "[phone number]", func(str []string) error {
 			fmt.Println("Phone number:", str)
 			return nil
@@ -319,12 +319,12 @@ func ExampleAddHelpCommandArg() {
 	if err != nil {
 		panic(err)
 	}
-	err = AddCommand([]string{"version", "v1"}, 0, "display version 1", "dis v1", "",
+	err = AddCommand([]string{"version", "v1"}, 1, 0, "display version 1", "dis v1", "",
 		"u1", func(str []string) error {
 			fmt.Println("version 1")
 			return nil
 		}, nil)
-	err = AddCommand([]string{"version", "v2"}, 0, "display version 2", "dis v2", "",
+	err = AddCommand([]string{"version", "v2"}, 1, 0, "display version 2", "dis v2", "",
 		"", func(str []string) error {
 			fmt.Println("version 2")
 			return nil

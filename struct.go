@@ -23,7 +23,8 @@ type work struct {
 // Work Queue
 type workQueue []work
 
-// Sort Work Queue, Order by Priority DESC
+// Sort Work Queue
+// Big first
 func (q *workQueue) sort() {
 	sort.Slice((*q)[:], func(i, j int) bool {
 		return (*q)[i].Priority > (*q)[j].Priority
@@ -58,6 +59,7 @@ func (q *workQueue) exec() (err error) {
 
 // Command
 type Command struct {
+	Order int
 	Name          string
 	Father        string
 	Describe      string
@@ -151,10 +153,18 @@ func (c *Command) GenerateHelp() {
 				lMax = len(v.Name)
 			}
 		}
+		lines := make(Lines, 0)
 		for _, v := range c.Commands {
-			line := fmt.Sprintf(fmt.Sprintf(HTplLineCommand, lMax), v.Name, v.DescribeBrief)
-			cmdLine += line
+			lines = append(lines, Line{
+				Order: v.Order,
+				Line:  fmt.Sprintf(fmt.Sprintf(HTplLineCommand, lMax), v.Name, v.DescribeBrief),
+			})
 		}
+		lines.Sort()
+		for _, v := range lines {
+			cmdLine += v.Line
+		}
+
 		commands = fmt.Sprintf(HTplCommandList, cmdLine, fullName)
 	}
 
@@ -167,9 +177,16 @@ func (c *Command) GenerateHelp() {
 				lMax = len(v.Name)
 			}
 		}
+		lines := make(Lines, 0)
 		for _, v := range c.Options {
-			line := fmt.Sprintf(fmt.Sprintf(HTplLineOption, lMax, lMax), v.Name, v.Usage, " ", v.DescribeBrief)
-			optLine += line
+			lines = append(lines, Line{
+				Order: v.Order,
+				Line:  fmt.Sprintf(fmt.Sprintf(HTplLineOption, lMax, lMax), v.Name, v.Usage, " ", v.DescribeBrief),
+			})
+		}
+		lines.Sort()
+		for _, v := range lines {
+			optLine += v.Line
 		}
 		options = fmt.Sprintf(HTplOptionList, optLine, fullName)
 	}
@@ -179,6 +196,7 @@ func (c *Command) GenerateHelp() {
 // Create a new Command
 func NewCommand(name, father string) *Command {
 	return &Command{
+		Order: 0,
 		Name:          name,
 		Describe:      "",
 		DescribeBrief: "",
@@ -194,9 +212,10 @@ func NewCommand(name, father string) *Command {
 }
 
 // Create a new Command
-func NewCommandFull(name, father, describe, describeBrief, help, usage string, size int,
+func NewCommandFull(order int, name, father, describe, describeBrief, help, usage string, size int,
 	executor FuncExecutor, errExecutor FuncErrorHandler) *Command {
 	return &Command{
+		Order: order,
 		Name:          name,
 		Describe:      describe,
 		DescribeBrief: describeBrief,
@@ -218,6 +237,7 @@ func NewCommands() map[string]*Command {
 
 // Option
 type Option struct {
+	Order int
 	Name          string
 	Father        string
 	Size          int
@@ -256,6 +276,7 @@ func (o *Option) GenerateHelp() {
 // Create a new Option
 func NewOption(name, father string) *Option {
 	return &Option{
+		Order: 0,
 		Name:          name,
 		Father:        father,
 		Size:          0,
@@ -270,9 +291,10 @@ func NewOption(name, father string) *Option {
 }
 
 // Create a new Option
-func NewOptionFull(name, father string, size, priority int, describe, describeBrief, help, usage string,
+func NewOptionFull(order int, name, father string, size, priority int, describe, describeBrief, help, usage string,
 	executor FuncExecutor, errExecutor FuncErrorHandler) *Option {
 	return &Option{
+		Order: order,
 		Name:          name,
 		Father:        father,
 		Size:          size,
@@ -289,4 +311,18 @@ func NewOptionFull(name, father string, size, priority int, describe, describeBr
 // Create a new Option map
 func NewOptions() map[string]*Option {
 	return make(map[string]*Option)
+}
+
+type Line struct {
+	Order int
+	Line string
+}
+
+type Lines []Line
+
+// Little first
+func (l *Lines) Sort() {
+	sort.Slice((*l)[:], func(i, j int) bool {
+		return (*l)[i].Order < (*l)[j].Order
+	})
 }

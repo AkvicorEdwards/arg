@@ -53,7 +53,7 @@ This project is free`
 	// Add a Command
 	vBuildType := ""
 	vBuildDel := false
-	err := arg.AddCommand([]string{"build"}, 2, "build to fi",
+	err := arg.AddCommand([]string{"build"}, 1, 2, "build to fi",
 		"build a file to fi", "", "[ori filename] [target filename]",
 		func(str []string) error {
 			fmt.Println("build", vBuildType, str[1:])
@@ -67,7 +67,7 @@ This project is free`
 		})
 
 	// Add a Option
-	err = arg.AddOption([]string{"build", "-type"}, 1, 10,
+	err = arg.AddOption([]string{"build", "-type"}, 1, 1, 10,
 		"This is a type for test", "test type", "", "[type]",
 		func(str []string) error {
 			fmt.Println("build type", str[1])
@@ -94,7 +94,7 @@ This project is free`
 	}
 
 	// Add a Option
-	err = arg.AddOption([]string{"build", "-del"}, 0, 10,
+	err = arg.AddOption([]string{"build", "-del"}, 1, 0, 10,
 		"delete origin file after build", "del origin file", "User design help", "",
 		func(str []string) error {
 			vBuildDel = true
@@ -237,17 +237,17 @@ if `OptionCombination = ' '`, set `prefix = ''`
 ## Package
 
 ```go
-AddCommand(arg []string, size int, describe, describeBrief, help, 
+AddCommand(arg []string, order, size int, describe, describeBrief, help, 
 	usage string, executor FuncExecutor, errExecutor FuncErrorHandler)
 ```
 
 ```go
-AddOption(arg []string, size, priority int, describe, describeBrief, help,
+AddOption(arg []string, order, size, priority int, describe, describeBrief, help,
 	usage string, executor FuncExecutor, errExecutor FuncErrorHandler) 
 ```
 
 ```go
-Add(isCmd bool, arg []string, size, priority int, describe, 
+Add(isCmd bool, arg []string, order, size, priority int, describe, 
 	describeBrief, help, usage string, executor FuncExecutor, 
 	errExecutor FuncErrorHandler) 
 ```
