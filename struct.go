@@ -59,7 +59,7 @@ func (q *workQueue) exec() (err error) {
 
 // Command
 type Command struct {
-	Order int
+	Order         int
 	Name          string
 	Father        string
 	Describe      string
@@ -85,7 +85,12 @@ func (c *Command) PrintHelp() {
 
 // Generate Help
 func (c *Command) GenerateHelp() {
+	if len(HelpCommandArgs) == 0 {
+		// No help command
+		return
+	}
 	if len(c.Help) != 0 {
+		// User does not have customized Help
 		return
 	}
 	if c.Commands != nil {
@@ -164,8 +169,17 @@ func (c *Command) GenerateHelp() {
 		for _, v := range lines {
 			cmdLine += v.Line
 		}
-
-		commands = fmt.Sprintf(HTplCommandList, cmdLine, fullName)
+		h := ""
+		T := true
+		for key := range HelpCommandArgs {
+			if T {
+				h += key
+				T = false
+			} else {
+				h += "/" + key
+			}
+		}
+		commands = fmt.Sprintf(HTplCommandList, cmdLine, fullName, h)
 	}
 
 	options := ""
@@ -188,7 +202,17 @@ func (c *Command) GenerateHelp() {
 		for _, v := range lines {
 			optLine += v.Line
 		}
-		options = fmt.Sprintf(HTplOptionList, optLine, fullName)
+		h := ""
+		T := true
+		for key := range HelpCommandArgs {
+			if T {
+				h += key
+				T = false
+			} else {
+				h += "/" + key
+			}
+		}
+		options = fmt.Sprintf(HTplOptionList, optLine, fullName, h)
 	}
 	c.Help = fmt.Sprintf(TplHelp, describe, usageHead, commands, options)
 }
@@ -196,7 +220,7 @@ func (c *Command) GenerateHelp() {
 // Create a new Command
 func NewCommand(name, father string) *Command {
 	return &Command{
-		Order: 0,
+		Order:         0,
 		Name:          name,
 		Describe:      "",
 		DescribeBrief: "",
@@ -215,7 +239,7 @@ func NewCommand(name, father string) *Command {
 func NewCommandFull(order int, name, father, describe, describeBrief, help, usage string, size int,
 	executor FuncExecutor, errExecutor FuncErrorHandler) *Command {
 	return &Command{
-		Order: order,
+		Order:         order,
 		Name:          name,
 		Describe:      describe,
 		DescribeBrief: describeBrief,
@@ -237,7 +261,7 @@ func NewCommands() map[string]*Command {
 
 // Option
 type Option struct {
-	Order int
+	Order         int
 	Name          string
 	Father        string
 	Size          int
@@ -276,7 +300,7 @@ func (o *Option) GenerateHelp() {
 // Create a new Option
 func NewOption(name, father string) *Option {
 	return &Option{
-		Order: 0,
+		Order:         0,
 		Name:          name,
 		Father:        father,
 		Size:          0,
@@ -294,7 +318,7 @@ func NewOption(name, father string) *Option {
 func NewOptionFull(order int, name, father string, size, priority int, describe, describeBrief, help, usage string,
 	executor FuncExecutor, errExecutor FuncErrorHandler) *Option {
 	return &Option{
-		Order: order,
+		Order:         order,
 		Name:          name,
 		Father:        father,
 		Size:          size,
@@ -315,7 +339,7 @@ func NewOptions() map[string]*Option {
 
 type Line struct {
 	Order int
-	Line string
+	Line  string
 }
 
 type Lines []Line

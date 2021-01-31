@@ -109,7 +109,7 @@ var HTplCommandList = `
 The commands are:
 
 %s
-Use "%s help <command>" for more information about a command.
+Use "%s %s <command>" for more information about a command.
 `
 
 // HTplOptionList ======================================================
@@ -127,7 +127,7 @@ var HTplOptionList = `
 The options are:
 
 %s
-Use "%s help <option>" for more information about a option.
+Use "%s %s <option>" for more information about a option.
 `
 
 // HTplOptionUsage ======================================================
